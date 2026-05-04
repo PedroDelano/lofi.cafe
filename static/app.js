@@ -17,6 +17,7 @@ const els = {
   trackList: document.getElementById("track-list"),
   btnRefresh: document.getElementById("btn-refresh"),
   btnNextGif: document.getElementById("btn-next-gif"),
+  btnPlayPause: document.getElementById("btn-play-pause"),
   audioTrack: document.getElementById("audio-track"),
   audioRain: document.getElementById("audio-rain"),
   audioKeys: document.getElementById("audio-keys"),
@@ -31,6 +32,7 @@ const els = {
 
 let tracks = [];
 let activeTrackId = null;
+let activeTrackTitle = null;
 let loadGeneration = 0;
 let gifIndex = GIFS.length ? Math.floor(Math.random() * GIFS.length) : -1;
 
@@ -38,6 +40,27 @@ function showToast(message) {
   els.toast.textContent = message;
   els.toast.classList.remove("hidden");
   setTimeout(() => els.toast.classList.add("hidden"), 3000);
+}
+
+function nowPlayingPrefix() {
+  return els.audioTrack.paused ? "⏸" : "▶";
+}
+
+function syncPlayPauseButton() {
+  els.btnPlayPause.textContent = els.audioTrack.paused ? "▶ play" : "⏸ pause";
+}
+
+function togglePlayPause() {
+  if (els.btnPlayPause.disabled) return;
+  if (els.audioTrack.paused) {
+    els.audioTrack.play().catch(() => {});
+    els.audioRain.play().catch(() => {});
+    els.audioKeys.play().catch(() => {});
+  } else {
+    els.audioTrack.pause();
+    els.audioRain.pause();
+    els.audioKeys.pause();
+  }
 }
 
 function applyVolumes() {
@@ -63,6 +86,7 @@ function renderTracks() {
 
 function playTrack(track) {
   activeTrackId = track.id;
+  activeTrackTitle = track.title;
   loadGeneration += 1;
   const gen = loadGeneration;
 
@@ -76,7 +100,8 @@ function playTrack(track) {
   };
   const onPlaying = () => {
     if (loadGeneration === gen) {
-      els.nowPlaying.textContent = `▶ ${track.title}`;
+      els.nowPlaying.textContent = `${nowPlayingPrefix()} ${track.title}`;
+      els.btnPlayPause.disabled = false;
     }
     cleanup();
   };
@@ -138,6 +163,31 @@ function init() {
   els.volKeys.addEventListener("input", applyVolumes);
   els.btnRefresh.addEventListener("click", refresh);
   els.btnNextGif.addEventListener("click", nextGif);
+  els.btnPlayPause.addEventListener("click", togglePlayPause);
+  els.audioTrack.addEventListener("play", () => {
+    if (els.btnPlayPause.disabled) return;
+    syncPlayPauseButton();
+    if (activeTrackTitle && els.nowPlaying.textContent.startsWith("⏸ ")) {
+      els.nowPlaying.textContent = `▶ ${activeTrackTitle}`;
+    }
+  });
+  els.audioTrack.addEventListener("pause", () => {
+    if (els.btnPlayPause.disabled) return;
+    syncPlayPauseButton();
+    if (activeTrackTitle && els.nowPlaying.textContent.startsWith("▶ ")) {
+      els.nowPlaying.textContent = `⏸ ${activeTrackTitle}`;
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.code !== "Space") return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON") {
+      return;
+    }
+    if (els.btnPlayPause.disabled) return;
+    event.preventDefault();
+    togglePlayPause();
+  });
   loadTracks();
 }
 

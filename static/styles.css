@@ -37,6 +37,13 @@ html, body {
   cursor: pointer;
 }
 .top-buttons button:hover { background: rgba(255,255,255,0.2); }
+.top-buttons button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.top-buttons button:disabled:hover {
+  background: rgba(255,255,255,0.12);
+}
 
 .sidebar {
   top: 4.5rem; right: 1.2rem; width: 240px;
