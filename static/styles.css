@@ -1,0 +1,94 @@
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; height: 100%; overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #f5f5f5; background: #1a1325;
+}
+
+#backdrop {
+  position: fixed; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.4s ease;
+}
+
+.topbar, .bottombar, .sidebar { position: fixed; z-index: 1; }
+
+.topbar {
+  top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0));
+}
+.now-playing {
+  background: rgba(0,0,0,0.45);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+.top-buttons button {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  margin-left: 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.top-buttons button:hover { background: rgba(255,255,255,0.2); }
+
+.sidebar {
+  top: 4.5rem; right: 1.2rem; width: 240px;
+  max-height: calc(100% - 9rem);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 0.6rem 0.5rem;
+  overflow-y: auto;
+}
+.sidebar h4 {
+  margin: 0 0 0.5rem; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7;
+}
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar li {
+  padding: 0.45rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.sidebar li:hover { background: rgba(255,255,255,0.08); }
+.sidebar li.active { background: rgba(255,255,255,0.18); }
+
+.bottombar {
+  bottom: 0; left: 0; right: 0;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0));
+}
+.slider-group {
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  padding: 0.55rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+}
+.slider-group label {
+  display: flex; justify-content: space-between;
+  margin-bottom: 0.35rem; opacity: 0.85;
+}
+.slider-group input[type=range] { width: 100%; }
+
+.toast {
+  position: fixed; bottom: 7rem; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(180, 30, 30, 0.85);
+  color: #fff;
+  padding: 0.55rem 0.95rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 2;
+  transition: opacity 0.25s ease;
+}
+.toast.hidden { opacity: 0; pointer-events: none; }

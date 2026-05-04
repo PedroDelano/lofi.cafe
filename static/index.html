@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>lofi.cafe</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div id="backdrop"></div>
+
+  <header class="topbar">
+    <div id="now-playing" class="now-playing">— select a track —</div>
+    <div class="top-buttons">
+      <button id="btn-refresh" type="button">⟳ refresh</button>
+      <button id="btn-next-gif" type="button">🖼 next gif</button>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <h4>Tracks</h4>
+    <ul id="track-list"></ul>
+  </aside>
+
+  <footer class="bottombar">
+    <div class="slider-group">
+      <label for="vol-track">track <span id="vol-track-val">80%</span></label>
+      <input id="vol-track" type="range" min="0" max="100" value="80">
+    </div>
+    <div class="slider-group">
+      <label for="vol-rain">rain <span id="vol-rain-val">40%</span></label>
+      <input id="vol-rain" type="range" min="0" max="100" value="40">
+    </div>
+    <div class="slider-group">
+      <label for="vol-keys">keyboard <span id="vol-keys-val">20%</span></label>
+      <input id="vol-keys" type="range" min="0" max="100" value="20">
+    </div>
+  </footer>
+
+  <audio id="audio-track" loop></audio>
+  <audio id="audio-rain" loop src="/static/ambient/rain.mp3"></audio>
+  <audio id="audio-keys" loop src="/static/ambient/keyboard.mp3"></audio>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
