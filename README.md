@@ -39,6 +39,34 @@ through bundled lofi GIFs as a backdrop.
 
 6. Open <http://localhost:8000>.
 
+## YouTube bot check (cookies)
+
+When running from a datacenter/VPS IP (e.g. in Docker), YouTube gates the
+audio download behind a *"Sign in to confirm you're not a bot"* check.
+Track listing still works, but `/tracks/{id}/audio` returns 503.
+
+To get past it, export your YouTube cookies and point the server at them:
+
+1. Export a Netscape-format `cookies.txt` from a logged-in YouTube session
+   (e.g. the "Get cookies.txt LOCALLY" browser extension).
+2. Set `YTDLP_COOKIES_FILE` to its path. When unset or the file is
+   missing, the server runs unauthenticated (fine for local dev).
+
+   ```bash
+   YTDLP_COOKIES_FILE=/path/to/cookies.txt uv run main.py
+   ```
+
+   In Docker, mount it and set the env var:
+
+   ```bash
+   docker run -p 8000:8000 \
+     -v /host/cookies.txt:/cookies.txt:ro \
+     -e YTDLP_COOKIES_FILE=/cookies.txt \
+     lofi-cafe
+   ```
+
+Cookies expire, so refresh the file if downloads start failing again.
+
 ## How it works
 
 - On startup the server fetches metadata for the latest 20 uploads from

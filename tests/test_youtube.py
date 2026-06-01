@@ -81,3 +81,54 @@ def test_download_audio_writes_file_and_returns_path(tmp_path: Path):
     opts = ctor.call_args.args[0]
     assert opts["format"].startswith("bestaudio")
     assert str(tmp_path) in opts["outtmpl"]
+
+
+def test_auth_opts_includes_cookiefile_when_file_exists(tmp_path: Path, monkeypatch):
+    cookies = tmp_path / "cookies.txt"
+    cookies.write_text("# Netscape HTTP Cookie File\n")
+    monkeypatch.setenv("YTDLP_COOKIES_FILE", str(cookies))
+
+    assert youtube._auth_opts() == {"cookiefile": str(cookies)}
+
+
+def test_auth_opts_empty_when_unset(monkeypatch):
+    monkeypatch.delenv("YTDLP_COOKIES_FILE", raising=False)
+
+    assert youtube._auth_opts() == {}
+
+
+def test_auth_opts_empty_when_file_missing(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("YTDLP_COOKIES_FILE", str(tmp_path / "absent.txt"))
+
+    assert youtube._auth_opts() == {}
+
+
+def test_download_audio_passes_cookiefile_to_yt_dlp(tmp_path: Path, monkeypatch):
+    cookies = tmp_path / "cookies.txt"
+    cookies.write_text("# Netscape HTTP Cookie File\n")
+    monkeypatch.setenv("YTDLP_COOKIES_FILE", str(cookies))
+
+    fake_ydl_inst = MagicMock()
+    fake_ydl_inst.extract_info.return_value = {"id": "abc", "ext": "m4a"}
+    fake_ydl_inst.prepare_filename.return_value = str(tmp_path / "abc.m4a")
+    fake_ydl = MagicMock()
+    fake_ydl.__enter__.return_value = fake_ydl_inst
+
+    with patch("youtube.yt_dlp.YoutubeDL", return_value=fake_ydl) as ctor:
+        youtube.download_audio("abc", tmp_path)
+
+    assert ctor.call_args.args[0]["cookiefile"] == str(cookies)
+
+
+def test_list_channel_tracks_passes_cookiefile_to_yt_dlp(tmp_path: Path, monkeypatch):
+    cookies = tmp_path / "cookies.txt"
+    cookies.write_text("# Netscape HTTP Cookie File\n")
+    monkeypatch.setenv("YTDLP_COOKIES_FILE", str(cookies))
+
+    fake_ydl = MagicMock()
+    fake_ydl.__enter__.return_value.extract_info.return_value = {"entries": []}
+
+    with patch("youtube.yt_dlp.YoutubeDL", return_value=fake_ydl) as ctor:
+        youtube.list_channel_tracks()
+
+    assert ctor.call_args.args[0]["cookiefile"] == str(cookies)
